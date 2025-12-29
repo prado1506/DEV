@@ -1,4 +1,6 @@
-from fastapi import FastAPI, Form, HTTPException
+from fastapi import FastAPI, Form, HTTPException, Request
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 import json
 import shlex
@@ -9,6 +11,15 @@ BASE_DIR = Path(__file__).parent
 KEYWORDS_FILE = BASE_DIR / "keywords.json"
 IGNORE_FILE = BASE_DIR / "ignore.json"
 
+# -------------------------
+# Templates e Static
+# -------------------------
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+app.mount(
+    "/static",
+    StaticFiles(directory=str(BASE_DIR / "static")),
+    name="static",
+)
 
 # -------------------------
 # Utils
@@ -26,13 +37,15 @@ def load_json(path: Path, default):
 
 
 def save_json(path: Path, data):
-    path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    path.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
 
 
 def parse_quoted_args(raw: str):
     """
-    Exemplo:
-    '"cupom sophee" ".*\\d+\\s?%"'
+    Exemplo: '"cupom sophee" ".*\\\\d+\\\\s?%"'
     """
     try:
         return shlex.split(raw)
@@ -41,19 +54,22 @@ def parse_quoted_args(raw: str):
 
 
 # -------------------------
-# Home
+# Home (HTML)
 # -------------------------
 @app.get("/")
-def index():
+def index(request: Request):
     keywords = load_json(KEYWORDS_FILE, {})
     ignores = load_json(IGNORE_FILE, [])
-
-    return {
-        "total_keywords": len(keywords),
-        "total_ignores": len(ignores),
-        "keywords": keywords,
-        "ignores": ignores,
-    }
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "keywords": keywords,
+            "ignores": ignores,
+            "total_keywords": len(keywords),
+            "total_ignores": len(ignores),
+        },
+    )
 
 
 # -------------------------
@@ -67,7 +83,6 @@ def list_keywords():
 @app.post("/keywords/add")
 def add_keyword(raw: str = Form(...)):
     args = parse_quoted_args(raw)
-
     if len(args) == 0:
         raise HTTPException(status_code=400, detail="Informe ao menos a palavra")
 
@@ -76,8 +91,8 @@ def add_keyword(raw: str = Form(...)):
 
     keywords = load_json(KEYWORDS_FILE, {})
     keywords[palavra] = {"regex": regex}
-
     save_json(KEYWORDS_FILE, keywords)
+
     return {"status": "ok", "palavra": palavra, "regex": regex}
 
 
@@ -106,7 +121,6 @@ def list_ignores():
 @app.post("/ignore/add")
 def add_ignore(raw: str = Form(...)):
     args = parse_quoted_args(raw)
-
     if len(args) == 0:
         raise HTTPException(status_code=400, detail='Uso correto: "termo"')
 
@@ -115,8 +129,8 @@ def add_ignore(raw: str = Form(...)):
 
     if termo not in ignores:
         ignores.append(termo)
+        save_json(IGNORE_FILE, ignores)
 
-    save_json(IGNORE_FILE, ignores)
     return {"status": "ok", "added": termo}
 
 
