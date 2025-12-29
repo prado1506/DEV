@@ -1,42 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
+    <meta charset="UTF-8">
     <title>ListShopCupom Dashboard</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>ListShopCupom Dashboard</h1>
+    <div class="container">
+        <h1>📋 ListShopCupom Dashboard</h1>
 
-    <section>
-        <h2>Keywords</h2>
-        <ul id="keywords-list">
-            {% for key, value in keywords.items() %}
-                <li>{{ key }} - regex: {{ value.regex }}</li>
-            {% endfor %}
-        </ul>
+        <!-- Keywords Section -->
+        <section class="card">
+            <h2>Keywords</h2>
+            <ul id="keywords-list">
+                {% for key, value in keywords.items() %}
+                    <li>{{ key }} - regex: {{ value.regex }}</li>
+                {% endfor %}
+            </ul>
 
-        <h3>Adicionar Keyword</h3>
-        <form id="add-keyword-form">
-            <input name="name" placeholder="Keyword" required>
-            <input name="regex" placeholder="Regex (opcional)">
-            <button type="submit">Adicionar</button>
-        </form>
-    </section>
+            <h3>Adicionar Keyword</h3>
+            <form id="add-keyword-form" class="form-inline">
+                <input name="name" placeholder="Keyword" required>
+                <input name="regex" placeholder="Regex (opcional)">
+                <button type="submit">Adicionar</button>
+            </form>
+        </section>
 
-    <section>
-        <h2>Ignore List</h2>
-        <ul id="ignore-list">
-            {% for item in ignores %}
-                <li>{{ item }} <button onclick="removeIgnore('{{ item }}')">Remover</button></li>
-            {% endfor %}
-        </ul>
+        <!-- Ignore Section -->
+        <section class="card">
+            <h2>Ignore List</h2>
+            <ul id="ignore-list">
+                {% for item in ignores %}
+                    <li>{{ item }} <button onclick="removeIgnore('{{ item }}')">Remover</button></li>
+                {% endfor %}
+            </ul>
 
-        <h3>Adicionar Ignore</h3>
-        <form id="add-ignore-form">
-            <input name="item" placeholder="Ignore item" required>
-            <button type="submit">Adicionar</button>
-        </form>
-    </section>
+            <h3>Adicionar Ignore</h3>
+            <form id="add-ignore-form" class="form-inline">
+                <input name="item" placeholder="Ignore item" required>
+                <button type="submit">Adicionar</button>
+            </form>
+        </section>
+    </div>
 
     <script>
         // Adicionar ignore
