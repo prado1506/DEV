@@ -1,0 +1,11 @@
+{
+  "cupom:": {
+    "regex": null
+  },
+  "cupom": {
+    "regex": ".*\\d+\\s?%"
+  },
+  "frete gratis": {
+    "regex": null
+  }
+}
