@@ -1,105 +1,124 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!doctype html>
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>ListShopCupom Dashboard</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="utf-8">
+  <title>ListShopCupom Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>📋 ListShopCupom Dashboard</h1>
+  <h1>ListShopCupom Dashboard</h1>
 
-        <!-- Keywords Section -->
-        <section class="card">
-            <h2>Keywords</h2>
-            <ul id="keywords-list">
-                {% for key, value in keywords.items() %}
-                    <li>{{ key }} - regex: {{ value.regex }}</li>
-                {% endfor %}
-            </ul>
+  <section>
+    <h2>Keywords ({{ total_keywords }})</h2>
+    <ul id="keywords-list">
+      {% for key, value in keywords.items() %}
+        <li>{{ key }} - regex: {{ value.regex }}</li>
+      {% endfor %}
+    </ul>
 
-            <h3>Adicionar Keyword</h3>
-            <form id="add-keyword-form" class="form-inline">
-                <input name="name" placeholder="Keyword" required>
-                <input name="regex" placeholder="Regex (opcional)">
-                <button type="submit">Adicionar</button>
-            </form>
-        </section>
+    <h3>Adicionar Keyword</h3>
+    <form id="add-keyword-form">
+      <input name="name" placeholder="Keyword" required>
+      <input name="regex" placeholder="Regex (opcional)">
+      <button type="submit">Adicionar</button>
+    </form>
+  </section>
 
-        <!-- Ignore Section -->
-        <section class="card">
-            <h2>Ignore List</h2>
-            <ul id="ignore-list">
-                {% for item in ignores %}
-                    <li>{{ item }} <button onclick="removeIgnore('{{ item }}')">Remover</button></li>
-                {% endfor %}
-            </ul>
+  <hr>
 
-            <h3>Adicionar Ignore</h3>
-            <form id="add-ignore-form" class="form-inline">
-                <input name="item" placeholder="Ignore item" required>
-                <button type="submit">Adicionar</button>
-            </form>
-        </section>
-    </div>
+  <section>
+    <h2>Ignore List ({{ total_ignores }})</h2>
+    <ul id="ignore-list">
+      {% for item in ignores %}
+        <li>{{ item }} <button type="button" onclick="removeIgnore('{{ item }}')">Remover</button></li>
+      {% endfor %}
+    </ul>
 
-    <script>
-        // Adicionar ignore
-        document.getElementById("add-ignore-form").onsubmit = async function(e){
-            e.preventDefault();
-            const item = this.item.value;
-            const res = await fetch("/addignore", {
-                method: "POST",
-                body: new URLSearchParams({item})
-            });
-            const data = await res.json();
-            renderIgnoreList(data.ignores);
-            this.reset();
-        }
+    <h3>Adicionar Ignore</h3>
+    <form id="add-ignore-form">
+      <input name="item" placeholder="Ignore item" required>
+      <button type="submit">Adicionar</button>
+    </form>
+  </section>
 
-        // Remover ignore
-        async function removeIgnore(item){
-            const res = await fetch("/removeignore", {
-                method: "POST",
-                body: new URLSearchParams({item})
-            });
-            const data = await res.json();
-            renderIgnoreList(data.ignores);
-        }
+  <script>
+    async function reloadKeywords() {
+      const res = await fetch("/keywords");
+      const data = await res.json();
+      const ul = document.getElementById("keywords-list");
+      ul.innerHTML = "";
+      for (const [key, val] of Object.entries(data)) {
+        const li = document.createElement("li");
+        li.textContent = `${key} - regex: ${val.regex}`;
+        ul.appendChild(li);
+      }
+    }
 
-        function renderIgnoreList(list){
-            const ul = document.getElementById("ignore-list");
-            ul.innerHTML = "";
-            list.forEach(i => {
-                const li = document.createElement("li");
-                li.innerHTML = `${i} <button onclick="removeIgnore('${i}')">Remover</button>`;
-                ul.appendChild(li);
-            });
-        }
+    async function reloadIgnores() {
+      const res = await fetch("/ignore");
+      const data = await res.json();
+      const ul = document.getElementById("ignore-list");
+      ul.innerHTML = "";
+      data.forEach(i => {
+        const li = document.createElement("li");
+        li.innerHTML = `${i} <button type="button" onclick="removeIgnore('${i}')">Remover</button>`;
+        ul.appendChild(li);
+      });
+    }
 
-        // Adicionar keyword
-        document.getElementById("add-keyword-form").onsubmit = async function(e){
-            e.preventDefault();
-            const name = this.name.value;
-            const regex = this.regex.value;
-            const res = await fetch("/addkeyword", {
-                method: "POST",
-                body: new URLSearchParams({name, regex})
-            });
-            const data = await res.json();
-            renderKeywordList(data.keywords);
-            this.reset();
-        }
+    document.getElementById("add-ignore-form").onsubmit = async function(e){
+      e.preventDefault();
+      const item = this.item.value.trim();
+      if (!item) return;
 
-        function renderKeywordList(dict){
-            const ul = document.getElementById("keywords-list");
-            ul.innerHTML = "";
-            for (const [key, val] of Object.entries(dict)){
-                const li = document.createElement("li");
-                li.textContent = `${key} - regex: ${val.regex}`;
-                ul.appendChild(li);
-            }
-        }
-    </script>
+      const res = await fetch("/ignore/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: new URLSearchParams({ raw: `"${item}"` })
+      });
+
+      if (res.ok) {
+        await reloadIgnores();
+        this.reset();
+      } else {
+        console.error("Erro ao adicionar ignore", await res.text());
+      }
+    };
+
+    async function removeIgnore(item){
+      const res = await fetch("/ignore/remove", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: new URLSearchParams({ termo: item })
+      });
+
+      if (res.ok) {
+        await reloadIgnores();
+      } else {
+        console.error("Erro ao remover ignore", await res.text());
+      }
+    }
+
+    document.getElementById("add-keyword-form").onsubmit = async function(e){
+      e.preventDefault();
+      const name = this.name.value.trim();
+      const regex = this.regex.value.trim();
+      if (!name) return;
+
+      const raw = `"${name}"` + (regex ? ` "${regex}"` : "");
+      const res = await fetch("/keywords/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: new URLSearchParams({ raw })
+      });
+
+      if (res.ok) {
+        await reloadKeywords();
+        this.reset();
+      } else {
+        console.error("Erro ao adicionar keyword", await res.text());
+      }
+    };
+  </script>
 </body>
 </html>
