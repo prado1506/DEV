@@ -146,3 +146,4 @@ def remove_ignore(termo: str = Form(...)):
     save_json(IGNORE_FILE, ignores)
 
     return {"status": "ok", "removed": termo}
+
