@@ -1,0 +1,11 @@
+<mat-toolbar color="primary">
+    <span>Device Manager</span>
+    <span class="spacer"></span>
+
+    @if (user$ | async; as user) {
+    <span class="user-name">{{ user.name }}</span>
+    <button mat-icon-button (click)="logout()">
+        <mat-icon>logout</mat-icon>
+    </button>
+    }
+</mat-toolbar>

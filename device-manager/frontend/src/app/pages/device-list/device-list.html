@@ -1,0 +1,117 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+    <div class="header">
+        <h1>Gerenciamento de Dispositivos</h1>
+        <button mat-raised-button color="primary" (click)="openDialog()">
+            <mat-icon>add</mat-icon>
+            Novo Dispositivo
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <mat-card class="filter-card">
+        <mat-card-content>
+            <form [formGroup]="filterForm">
+                <div class="filter-row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Localização</mat-label>
+                        <input matInput formControlName="location" placeholder="Filtrar por localização">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Status</mat-label>
+                        <mat-select formControlName="in_use">
+                            <mat-option value="">Todos</mat-option>
+                            <mat-option [value]="true">Em uso</mat-option>
+                            <mat-option [value]="false">Disponível</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Data de compra (De)</mat-label>
+                        <input matInput [matDatepicker]="pickerFrom" formControlName="purchase_date_from">
+                        <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+                        <mat-datepicker #pickerFrom></mat-datepicker>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Data de compra (Até)</mat-label>
+                        <input matInput [matDatepicker]="pickerTo" formControlName="purchase_date_to">
+                        <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+                        <mat-datepicker #pickerTo></mat-datepicker>
+                    </mat-form-field>
+                </div>
+
+                <div class="filter-actions">
+                    <button mat-raised-button color="accent" (click)="applyFilters()">
+                        <mat-icon>search</mat-icon>
+                        Filtrar
+                    </button>
+                    <button mat-button (click)="clearFilters()">
+                        <mat-icon>clear</mat-icon>
+                        Limpar
+                    </button>
+                </div>
+            </form>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Tabela -->
+    @if (loading) {
+    <div class="loading">
+        <mat-spinner></mat-spinner>
+    </div>
+    } @else {
+    <div class="table-container">
+        <table mat-table [dataSource]="devices" class="mat-elevation-z8">
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Nome</th>
+                <td mat-cell *matCellDef="let device">{{ device.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="location">
+                <th mat-header-cell *matHeaderCellDef>Localização</th>
+                <td mat-cell *matCellDef="let device">{{ device.location }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="purchase_date">
+                <th mat-header-cell *matHeaderCellDef>Data de Compra</th>
+                <td mat-cell *matCellDef="let device">{{ device.purchase_date | date:'dd/MM/yyyy' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="in_use">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let device">
+                    <mat-chip [class.in-use]="device.in_use" [class.available]="!device.in_use">
+                        {{ device.in_use ? 'Em uso' : 'Disponível' }}
+                    </mat-chip>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Ações</th>
+                <td mat-cell *matCellDef="let device">
+                    <button mat-icon-button color="primary" (click)="toggleUse(device)"
+                        [matTooltip]="device.in_use ? 'Marcar como disponível' : 'Marcar como em uso'">
+                        <mat-icon>{{ device.in_use ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                    </button>
+                    <button mat-icon-button color="accent" (click)="openDialog(device)" matTooltip="Editar">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="deleteDevice(device)" matTooltip="Excluir">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <mat-paginator [length]="totalItems" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 15, 25, 50]"
+            (page)="onPageChange($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+    }
+</div>

@@ -1,0 +1,48 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Dispositivo' : 'Novo Dispositivo' }}</h2>
+
+<mat-dialog-content>
+    <form [formGroup]="deviceForm">
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nome do Dispositivo</mat-label>
+            <input matInput formControlName="name" placeholder="Ex: iPhone 15 Pro">
+            @if (deviceForm.get('name')?.hasError('required')) {
+            <mat-error>Nome é obrigatório</mat-error>
+            }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Localização</mat-label>
+            <input matInput formControlName="location" placeholder="Ex: Escritório - Mesa 3">
+            @if (deviceForm.get('location')?.hasError('required')) {
+            <mat-error>Localização é obrigatória</mat-error>
+            }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Data de Compra</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="purchase_date" [max]="today">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            @if (deviceForm.get('purchase_date')?.hasError('required')) {
+            <mat-error>Data de compra é obrigatória</mat-error>
+            }
+        </mat-form-field>
+
+        <mat-checkbox formControlName="in_use" class="full-width">
+            Em uso
+        </mat-checkbox>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" [disabled]="loading">
+        Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="loading || !deviceForm.valid">
+        @if (loading) {
+        <mat-spinner diameter="20"></mat-spinner>
+        } @else {
+        {{ isEdit ? 'Atualizar' : 'Criar' }}
+        }
+    </button>
+</mat-dialog-actions>

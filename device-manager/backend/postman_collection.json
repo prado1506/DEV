@@ -1,0 +1,454 @@
+{
+    "info": {
+        "name": "Device Manager API",
+        "description": "API completa para gerenciamento de dispositivos com autenticação JWT",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "1234567"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://127.0.0.1:8000/api",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Register",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    console.log('Usuário criado:', response.user);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"senha12345\",\n    \"password_confirmation\": \"senha12345\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "register"
+                            ]
+                        },
+                        "description": "Registra um novo usuário no sistema"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"senha12345\",\n    \"password_confirmation\": \"senha12345\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/register",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "register"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "body": "{\n    \"message\": \"Usuário criado com sucesso\",\n    \"user\": {\n        \"id\": 1,\n        \"name\": \"John Doe\",\n        \"email\": \"john@example.com\",\n        \"created_at\": \"2024-01-15T10:00:00.000000Z\",\n        \"updated_at\": \"2024-01-15T10:00:00.000000Z\"\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.collectionVariables.set('token', response.token);",
+                                    "    console.log('Token salvo:', response.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"senha123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "login"
+                            ]
+                        },
+                        "description": "Autentica um usuário e retorna um token JWT"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"senha123\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/login",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "login"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "body": "{\n    \"message\": \"Login realizado com sucesso\",\n    \"user\": {\n        \"id\": 1,\n        \"name\": \"Admin User\",\n        \"email\": \"admin@example.com\"\n    },\n    \"token\": \"1|abcdef123456789...\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/logout",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "logout"
+                            ]
+                        },
+                        "description": "Faz logout do usuário e invalida o token"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/logout",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "logout"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "body": "{\n    \"message\": \"Logout realizado com sucesso\"\n}"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Devices",
+            "item": [
+                {
+                    "name": "List Devices",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/devices?page=1&per_page=15",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "devices"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Número da página"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "Itens por página"
+                                },
+                                {
+                                    "key": "location",
+                                    "value": "Escritório",
+                                    "disabled": true,
+                                    "description": "Filtrar por localização"
+                                },
+                                {
+                                    "key": "in_use",
+                                    "value": "true",
+                                    "disabled": true,
+                                    "description": "Filtrar por status (true/false)"
+                                },
+                                {
+                                    "key": "purchase_date_from",
+                                    "value": "2024-01-01",
+                                    "disabled": true,
+                                    "description": "Data inicial (YYYY-MM-DD)"
+                                },
+                                {
+                                    "key": "purchase_date_to",
+                                    "value": "2024-12-31",
+                                    "disabled": true,
+                                    "description": "Data final (YYYY-MM-DD)"
+                                }
+                            ]
+                        },
+                        "description": "Lista todos os dispositivos do usuário autenticado com paginação e filtros opcionais"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Device",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"iPhone 15 Pro Max\",\n    \"location\": \"Escritório - Sala 301\",\n    \"purchase_date\": \"2024-01-15\",\n    \"in_use\": true\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/devices",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "devices"
+                            ]
+                        },
+                        "description": "Cria um novo dispositivo"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Show Device",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/devices/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "devices",
+                                "1"
+                            ]
+                        },
+                        "description": "Exibe detalhes de um dispositivo específico"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Device",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"iPhone 15 Pro Max - Atualizado\",\n    \"location\": \"Home Office\",\n    \"purchase_date\": \"2024-02-20\",\n    \"in_use\": false\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/devices/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "devices",
+                                "1"
+                            ]
+                        },
+                        "description": "Atualiza um dispositivo existente"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Toggle Device Use",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/devices/1/use",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "devices",
+                                "1",
+                                "use"
+                            ]
+                        },
+                        "description": "Alterna o status de uso do dispositivo (em uso/disponível)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Device",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/devices/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "devices",
+                                "1"
+                            ]
+                        },
+                        "description": "Deleta um dispositivo (soft delete)"
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+}

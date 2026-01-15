@@ -1,0 +1,11 @@
+.git
+.gitignore
+node_modules
+dist
+.angular
+coverage
+.vscode
+.idea
+*.log
+.env
+.env.local

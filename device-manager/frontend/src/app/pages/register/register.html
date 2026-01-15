@@ -1,0 +1,62 @@
+<div class="register-container">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Cadastro</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Nome</mat-label>
+                    <input matInput type="text" formControlName="name" placeholder="Seu nome">
+                    @if (registerForm.get('name')?.hasError('required')) {
+                    <mat-error>Nome é obrigatório</mat-error>
+                    }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Email</mat-label>
+                    <input matInput type="email" formControlName="email" placeholder="seu@email.com">
+                    @if (registerForm.get('email')?.hasError('required')) {
+                    <mat-error>Email é obrigatório</mat-error>
+                    }
+                    @if (registerForm.get('email')?.hasError('email')) {
+                    <mat-error>Email inválido</mat-error>
+                    }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Senha</mat-label>
+                    <input matInput type="password" formControlName="password" placeholder="********">
+                    @if (registerForm.get('password')?.hasError('required')) {
+                    <mat-error>Senha é obrigatória</mat-error>
+                    }
+                    @if (registerForm.get('password')?.hasError('minlength')) {
+                    <mat-error>Senha deve ter no mínimo 8 caracteres</mat-error>
+                    }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Confirmar Senha</mat-label>
+                    <input matInput type="password" formControlName="password_confirmation" placeholder="********">
+                    @if (registerForm.hasError('mismatch')) {
+                    <mat-error>As senhas não coincidem</mat-error>
+                    }
+                </mat-form-field>
+
+                <button mat-raised-button color="primary" type="submit" [disabled]="loading || !registerForm.valid"
+                    class="full-width">
+                    @if (loading) {
+                    <mat-spinner diameter="20"></mat-spinner>
+                    } @else {
+                    Cadastrar
+                    }
+                </button>
+            </form>
+
+            <div class="login-link">
+                <p>Já tem uma conta? <a routerLink="/login">Faça login</a></p>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>
