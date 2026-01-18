@@ -1,4 +1,11 @@
-import { Page, Locator } from '@playwright/test';
+import { test } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
+import { login } from '../helpers/auth';
+
+test.beforeEach(async ({ page }) => {
+  await login(page);
+});
+
 
 export class DashboardPage {
   readonly page: Page;
