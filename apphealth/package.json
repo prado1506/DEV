@@ -7,9 +7,10 @@
   "scripts": {
     "test": "playwright test",
     "test:watch": "playwright test --watch",
-    "test:debug": "playwright test --debug",
     "test:ui": "playwright test --ui",
-    "test:report": "playwright show-report"
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
+    "test:headed": "playwright test --headed"
   },
   "keywords": [
     "playwright",

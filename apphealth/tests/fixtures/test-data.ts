@@ -1,3 +1,8 @@
+export const TEST_CREDENTIALS = {
+  cpf: '67842863083',
+  senha: '67842',
+};
+
 export const TEST_DATA = {
   users: {
     qa: {

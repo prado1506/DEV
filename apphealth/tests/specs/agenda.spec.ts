@@ -1,56 +1,86 @@
 import { test, expect } from '@playwright/test';
+import { login } from '../helpers/auth';
 import { DashboardPage } from '../pages/dashboard.page';
 import { AgendaPage } from '../pages/agenda.page';
+import { TEST_CREDENTIALS, TEST_DATA } from '../fixtures/test-data';
 
-test.describe('Agenda - Testes E2E', () => {
-  let dashboardPage: DashboardPage;
-  let agendaPage: AgendaPage;
-
+test.describe('App Health - Testes E2E', () => {
   test.beforeEach(async ({ page }) => {
-    dashboardPage = new DashboardPage(page);
-    agendaPage = new AgendaPage(page);
+    console.log('\n🔄 ========== NOVO TESTE ==========');
+    // Login antes de cada teste
+    await login(page, TEST_CREDENTIALS.cpf, TEST_CREDENTIALS.senha);
   });
 
-  test('Deve carregar o dashboard', async () => {
+  test('✅ TC001 - Deve carregar o dashboard após login', async ({ page }) => {
+    const dashboardPage = new DashboardPage(page);
     await dashboardPage.goto();
 
     const isLoaded = await dashboardPage.isPageLoaded();
     expect(isLoaded).toBeTruthy();
+    console.log('✅ Dashboard carregou com sucesso');
   });
 
-  test('Deve navegar para agenda corretamente', async () => {
+  test('✅ TC002 - Deve navegar para Agenda', async ({ page }) => {
+    const dashboardPage = new DashboardPage(page);
+    const agendaPage = new AgendaPage(page);
+
     await dashboardPage.goto();
     await dashboardPage.navigateToAgenda();
 
-    expect(agendaPage.page.url()).toContain('atendimento');
+    expect(page.url()).toContain('atendimento');
     const isLoaded = await agendaPage.isPageLoaded();
     expect(isLoaded).toBeTruthy();
+    console.log('✅ Navegação para Agenda funcionou');
   });
 
-  test('Deve exibir agenda com dados', async () => {
+  test('✅ TC003 - Deve exibir grid de agenda com dados', async ({ page }) => {
+    const agendaPage = new AgendaPage(page);
     await agendaPage.goto();
 
     const isLoaded = await agendaPage.isPageLoaded();
     expect(isLoaded).toBeTruthy();
 
     const count = await agendaPage.getAppointmentCount();
-    expect(count).toBeGreaterThanOrEqual(0);
+    console.log(`✅ Agenda contém ${count} agendamentos`);
   });
 
-  test('Deve buscar paciente pela agenda', async () => {
+  test('✅ TC004 - Deve buscar paciente por nome', async ({ page }) => {
+    const agendaPage = new AgendaPage(page);
     await agendaPage.goto();
 
-    await agendaPage.searchByName('Eliana');
+    await agendaPage.searchByName(TEST_DATA.pacientes.eliana);
 
-    // Verificar se há resultados na tabela
-    const rows = await agendaPage.agendaTable.locator('tbody tr').count();
-    expect(rows).toBeGreaterThan(0);
+    const found = await agendaPage.getAppointmentByName(TEST_DATA.pacientes.eliana);
+    expect(found).toBeTruthy();
+    console.log(`✅ Paciente ${TEST_DATA.pacientes.eliana} encontrado`);
   });
 
-  test('Deve selecionar profissional', async () => {
+  test('✅ TC005 - Deve exibir seletor de profissional', async ({ page }) => {
+    const agendaPage = new AgendaPage(page);
     await agendaPage.goto();
 
-    const isSelectorVisible = await agendaPage.profissionalSelect.isVisible();
-    expect(isSelectorVisible).toBeTruthy();
+    const isVisible = await agendaPage.profissionalSelect.isVisible();
+    expect(isVisible).toBeTruthy();
+    console.log('✅ Seletor de profissional está visível');
+  });
+
+  test('✅ TC006 - Deve navegar para Pacientes', async ({ page }) => {
+    const dashboardPage = new DashboardPage(page);
+    await dashboardPage.goto();
+
+    await dashboardPage.navigateToPacientes();
+
+    expect(page.url()).toContain('sujeitos-de-atencao');
+    console.log('✅ Navegação para Pacientes funcionou');
+  });
+
+  test('✅ TC007 - Deve navegar para Relatórios', async ({ page }) => {
+    const dashboardPage = new DashboardPage(page);
+    await dashboardPage.goto();
+
+    await dashboardPage.navigateToRelatorios();
+
+    expect(page.url()).toContain('relatorios');
+    console.log('✅ Navegação para Relatórios funcionou');
   });
 });

@@ -1,23 +1,51 @@
-import { Page } from '@playwright/test';
+// helpers/auth.ts
+import { expect, test, APIRequestContext, Page } from '@playwright/test';
 
-export async function login(page: Page) {
-    await page.goto('/#/login');
+export async function loginViaAPI(
+    request: APIRequestContext,
+    username = '67842863083',
+    password = '67842'
+): Promise<string> {
+    const response = await request.post(
+        'https://sistema.homologacao.apphealth.com.br/oauth/token',
+        {
+            // muitas APIs de oauth esperam form-url-encoded:
+            form: {
+                grant_type: 'password',
+                username,
+                password,
+                client_id: 'APPHEALTH_WEB',
+            },
+            // headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }
+    );
 
-    // Tenta preencher campos de email
-    const usernameInputs = page.locator('input');
-    if ((await usernameInputs.count()) > 0) {
-        await usernameInputs.nth(0).fill('67842863083');
-    }
+    expect(response.status(), 'Login API deve retornar 200').toBe(200); // falha clara no próprio teste
+    const data = (await response.json()) as { access_token?: string };
+    expect(data.access_token, 'Token deve estar presente na resposta').toBeTruthy();
+    return data.access_token!;
+}
 
-    // Tenta preencher senha
-    const passwordInputs = page.locator('input[type="password"]');
-    if ((await passwordInputs.count()) > 0) {
-        await passwordInputs.nth(0).fill('67842');
-    }
+export async function injectAuthToken(page: Page, token: string) {
+    await page.goto('https://sistema.homologacao.apphealth.com.br/#/'); // URL absoluta
+    await page.evaluate((tok) => {
+        localStorage.setItem('access_token', tok);
+        localStorage.setItem('token', tok);
+    }, token);
 
-    // Clica qualquer botão principal
-    await page.getByRole('button').first().click();
+    await page.context().addCookies([
+        {
+            name: 'access_token',
+            value: token,
+            url: 'https://sistema.homologacao.apphealth.com.br',
+        },
+    ]);
 
-    // Aguarda redirecionamento
-    await page.waitForURL('**/#/**');
+    await page.reload();
+    await page.waitForLoadState('networkidle');
+}
+
+export async function login(page: Page, request: APIRequestContext) {
+    const token = await loginViaAPI(request);
+    await injectAuthToken(page, token);
 }

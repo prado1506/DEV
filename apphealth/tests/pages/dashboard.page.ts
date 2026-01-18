@@ -1,29 +1,22 @@
-import { test } from '@playwright/test';
-import type { Locator, Page } from '@playwright/test';
-import { login } from '../helpers/auth';
-
-test.beforeEach(async ({ page }) => {
-  await login(page);
-});
-
+import { Page, Locator } from '@playwright/test';
 
 export class DashboardPage {
   readonly page: Page;
   readonly heading: Locator;
   readonly agendaLink: Locator;
   readonly pacientesLink: Locator;
+  readonly relatoriosLink: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    // Usar heading em vez de procurar por texto específico
     this.heading = page.locator('h1, h2').first();
     this.agendaLink = page.getByRole('link', { name: /Agenda/i });
     this.pacientesLink = page.getByRole('link', { name: /Pacientes/i });
+    this.relatoriosLink = page.getByRole('link', { name: /Relatórios/i });
   }
 
   async goto() {
     await this.page.goto('/#/');
-    // Aguardar a página carregar
     await this.page.waitForLoadState('networkidle');
   }
 
@@ -32,7 +25,21 @@ export class DashboardPage {
     await this.page.waitForURL('**/#/atendimento');
   }
 
+  async navigateToPacientes() {
+    await this.pacientesLink.click();
+    await this.page.waitForURL('**/#/sujeitos-de-atencao');
+  }
+
+  async navigateToRelatorios() {
+    await this.relatoriosLink.click();
+    await this.page.waitForURL('**/#/relatorios**');
+  }
+
   async isPageLoaded(): Promise<boolean> {
-    return await this.page.locator('main, [role="main"]').isVisible();
+    try {
+      return await this.page.locator('main, [role="main"]').isVisible({ timeout: 5000 });
+    } catch {
+      return false;
+    }
   }
 }
