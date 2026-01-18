@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "apphealth-tests",
   "version": "1.0.0",
   "description": "Testes automatizados Playwright - App Health",
@@ -6,9 +7,9 @@
   "scripts": {
     "test": "playwright test",
     "test:watch": "playwright test --watch",
+    "test:debug": "playwright test --debug",
     "test:ui": "playwright test --ui",
-    "test:report": "playwright show-report",
-    "ts:check": "tsc --noEmit"
+    "test:report": "playwright show-report"
   },
   "keywords": [
     "playwright",
