@@ -1,0 +1,56 @@
+{
+  "compilerOptions": {
+    // 🎯 Raízes do projeto
+    "rootDir": "./",
+    "outDir": "./dist",
+    // ⚙️ Configuração para Playwright/Node
+    "target": "ES2020",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": [
+      "ES2020"
+    ],
+    "types": [
+      "node",
+      "@playwright/test"
+    ],
+    // 📝 Source Maps e Declarations (útil para debug)
+    "sourceMap": true,
+    "declaration": false,
+    "declarationMap": false,
+    // ✅ Strict Mode (essencial para qualidade)
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    // 🛡️ Verificações adicionais
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitOverride": true,
+    // 📦 Módulos e imports
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "verbatimModuleSyntax": false,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+  },
+  "include": [
+    "tests/**/*.ts",
+    "playwright.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".git",
+    "playwright-report"
+  ]
+}

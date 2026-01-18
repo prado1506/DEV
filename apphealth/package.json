@@ -1,0 +1,26 @@
+{
+  "name": "apphealth-tests",
+  "version": "1.0.0",
+  "description": "Testes automatizados Playwright - App Health",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:watch": "playwright test --watch",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+    "ts:check": "tsc --noEmit"
+  },
+  "keywords": [
+    "playwright",
+    "e2e",
+    "tests",
+    "apphealth"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

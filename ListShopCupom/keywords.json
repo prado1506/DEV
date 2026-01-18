@@ -3,7 +3,7 @@
     "regex": null
   },
   "cupom": {
-    "regex": ".*\\d+\\s?%"
+    "regex": null
   },
   "frete gratis": {
     "regex": null
