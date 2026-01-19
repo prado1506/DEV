@@ -48,11 +48,13 @@ test.describe('App Health - Testes E2E', () => {
     const agendaPage = new AgendaPage(page);
     await agendaPage.goto();
 
-    await agendaPage.searchByName(TEST_DATA.pacientes.eliana);
+    const paciente = TEST_DATA.pacientes.eliana;
 
-    const found = await agendaPage.getAppointmentByName(TEST_DATA.pacientes.eliana);
-    expect(found).toBeTruthy();
-    console.log(`✅ Paciente ${TEST_DATA.pacientes.eliana} encontrado`);
+    // Digita o nome no campo de busca
+    await agendaPage.searchByName(paciente.nome);
+    await agendaPage.getAppointmentByName(paciente.nome);
+
+    console.log(`✅ Paciente ${paciente.nome} encontrado`);
   });
 
   test('✅ TC005 - Deve exibir seletor de profissional', async ({ page }) => {

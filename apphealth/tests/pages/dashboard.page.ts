@@ -32,12 +32,12 @@ export class DashboardPage {
 
   async navigateToRelatorios() {
     await this.relatoriosLink.click();
-    await this.page.waitForURL('**/#/relatorios**');
+    await this.page.waitForURL('**/#/relatorios/**');
   }
 
   async isPageLoaded(): Promise<boolean> {
     try {
-      return await this.page.locator('main, [role="main"]').isVisible({ timeout: 5000 });
+      return await this.page.getByText('Dashboard').isVisible();  
     } catch {
       return false;
     }

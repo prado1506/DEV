@@ -1,51 +1,33 @@
-// helpers/auth.ts
-import { expect, test, APIRequestContext, Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 
-export async function loginViaAPI(
-    request: APIRequestContext,
-    username = '67842863083',
-    password = '67842'
-): Promise<string> {
-    const response = await request.post(
-        'https://sistema.homologacao.apphealth.com.br/oauth/token',
-        {
-            // muitas APIs de oauth esperam form-url-encoded:
-            form: {
-                grant_type: 'password',
-                username,
-                password,
-                client_id: 'APPHEALTH_WEB',
-            },
-            // headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        }
-    );
+export async function login(page: Page, cpf: string = '67842863083', senha: string = '67842') {
+    console.log('🔐 Iniciando login...');
 
-    expect(response.status(), 'Login API deve retornar 200').toBe(200); // falha clara no próprio teste
-    const data = (await response.json()) as { access_token?: string };
-    expect(data.access_token, 'Token deve estar presente na resposta').toBeTruthy();
-    return data.access_token!;
-}
+    await page.goto('/#/login', { waitUntil: 'networkidle' });
 
-export async function injectAuthToken(page: Page, token: string) {
-    await page.goto('https://sistema.homologacao.apphealth.com.br/#/'); // URL absoluta
-    await page.evaluate((tok) => {
-        localStorage.setItem('access_token', tok);
-        localStorage.setItem('token', tok);
-    }, token);
+    console.log('📝 Preenchendo CPF:', cpf);
+    await page.getByRole('textbox', { name: 'CPF' }).fill(cpf);
 
-    await page.context().addCookies([
-        {
-            name: 'access_token',
-            value: token,
-            url: 'https://sistema.homologacao.apphealth.com.br',
-        },
+    console.log('🔑 Preenchendo Senha');
+    await page.getByRole('textbox', { name: 'Senha' }).fill(senha);
+
+    console.log('🔘 Clicando no botão de Login');
+    await Promise.all([
+        await page.getByRole('button', { name: 'Entrar' }).click(),
+        await page.waitForNavigation({ waitUntil: 'networkidle' }), // Espera a navegação completar após o login
     ]);
 
-    await page.reload();
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByText('Dashboard')).toBeVisible();
+
+    console.log('🔥 Login confirmado, dashboard carregado!');
+    return true;
 }
 
-export async function login(page: Page, request: APIRequestContext) {
-    const token = await loginViaAPI(request);
-    await injectAuthToken(page, token);
+export async function logout(page: Page) {
+    console.log('🚪 Efetuando logout...');
+    const userMenu = page.getByRole('button').filter({ hasText: /avatar|user|menu|profile/i }).last();
+    if (await userMenu.isVisible()) await userMenu.click();
+    const logoutButton = page.getByRole('menuitem', { name: /logout|sair|exit/i });
+    if (await logoutButton.isVisible()) await logoutButton.click();
+    console.log('👋 Sessão encerrada!');
 }

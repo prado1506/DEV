@@ -4,13 +4,7 @@ export const TEST_CREDENTIALS = {
 };
 
 export const TEST_DATA = {
-  users: {
-    qa: {
-      email: 'qa_user@apphealth.com',
-      password: 'SenhaForte123',
-    },
-  },
-  
+
   pacientes: {
     eliana: {
       nome: 'Eliana',
