@@ -1,24 +1,29 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/specs',
-  fullyParallel: false, // Desabilitar paralelo durante testes de login
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: 1, // Apenas 1 worker para não sobrecarregar login
+  workers: 1,
   reporter: 'html',
 
   use: {
-    baseURL: 'https://sistema.homologacao.apphealth.com.br',
+    baseURL: 'about:blank',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    headless: false,
+    isMobile: false,
+
+    // 1) O site “enxerga” isso:
+    viewport: null ,
+
+    // 2) A janela do Chromium nasce nesse tamanho:
+    launchOptions: {
+      args: ['--start-maximized'],
+    },
   },
 
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-  ],
+//
 });

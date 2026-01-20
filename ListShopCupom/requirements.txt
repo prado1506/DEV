@@ -1,6 +1,0 @@
-telethon
-python-dotenv
-fastapi
-uvicorn
-python-multipart
-jinja2
